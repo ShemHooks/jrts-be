@@ -22,8 +22,10 @@ class AuthController extends BaseController
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
-            'dept_id' => 'required|string|exists:departments,id',
+            'dept_id' => 'nullable|string|exists:departments,id',
             'position' => 'required|string|max:255',
+            'suffix' => 'nullable|string',
+            'role' => "required|string",
         ]);
 
         if ($validator->fails()) {
@@ -35,6 +37,7 @@ class AuthController extends BaseController
         $input['password'] = $temporary_password;
         $input['required_change'] = true;
         $input['password_changed_date'] = null;
+        $input['is_activated'] = false;
 
         $user = User::create($input);
         Mail::to($user->email)->send(new SendTemporaryPassword($user->name, $temporary_password));
