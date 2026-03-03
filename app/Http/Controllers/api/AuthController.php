@@ -51,9 +51,10 @@ class AuthController extends BaseController
     public function login(Request $request)
     {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+
             $user = Auth::user();
 
-            if ($user->account_status === 'archived') {
+            if (!$user->is_activated) {
                 return $this->sendError('Not Authorized', ['error' => 'Your Account is Archived, Please contact administrator'], 403);
             }
 
@@ -101,6 +102,36 @@ class AuthController extends BaseController
         $user->currentAccessToken()->delete();
 
         return $this->sendResponse(null, "User logged out successfully");
+    }
+
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $validator = Validator::make($request->all(), [
+            'temp_password' => 'required|string',
+            'new_password' => 'required|string|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors());
+        }
+
+        if (!Hash::check($request->input('temp_password'), $user->password)) {
+            return $this->sendError('Invalid temporary password', ['error' => 'Temporary password is incorrect.']);
+        }
+
+        if (Hash::check($request->input('new_password'), $user->password)) {
+            return $this->sendError('Detected Reusing of Password', ['error' => 'New password must be different from the old password']);
+        }
+
+        $user->password = bcrypt($request->input('new_password'));
+        $user->required_change = false;
+        $user->password_changed_date = now();
+        $user->save();
+
+        // $this->logUserActions($user->id, 'Change Password', "{$user->name} Change their password", null);
+        return $this->sendResponse(null, 'Password changed successfully.');
     }
 
 }

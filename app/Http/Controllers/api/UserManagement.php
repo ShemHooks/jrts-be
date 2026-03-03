@@ -34,6 +34,7 @@ class UserManagement extends BaseController
             })->paginate((int) $number_per_page);
 
         return $this->sendResponse($users, 'List of Users');
-
     }
+
+
 }
