@@ -3,10 +3,22 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller as Controller;
+use App\Models\System_Log;
 
 
 class BaseController extends Controller
 {
+
+    public function insertSystemLogs(array $data)
+    {
+        try {
+            $logs = System_Log::create($data);
+            return $logs;
+        } catch (\Exception $e) {
+            \Log::error("Recording Logs Error", $e->getMessage());
+            return null;
+        }
+    }
     public function sendResponse($result = null, $message)
     {
         $response = [

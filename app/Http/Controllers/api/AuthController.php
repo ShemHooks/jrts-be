@@ -45,6 +45,14 @@ class AuthController extends BaseController
         Mail::to($user->email)->send(new SendTemporaryPassword($user->name, $temporary_password));
         $success['name'] = $user->name;
 
+        $logs = [
+            'user_id' => $user->id,
+            'action' => "{$user->name} Create {$user->name} Account"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
         return $this->sendResponse($success, 'User Created Successfully');
     }
 
@@ -63,6 +71,15 @@ class AuthController extends BaseController
             $success['required_change_password'] = $user->required_change;
             $success['dept_id'] = $user->dept_id;
             $success['role'] = $user->role;
+
+            $logs = [
+                'user_id' => $user->id,
+                'action' => "{$user->name} Change Login"
+
+            ];
+
+            $this->insertSystemLogs($logs);
+
             return $this->sendResponse($success, 'User Login Successfully.');
 
         } else {
@@ -91,6 +108,14 @@ class AuthController extends BaseController
         $user->save();
 
         Mail::to($user->email)->send(new ForgotPassword($user->name, $temporary_password));
+
+        $logs = [
+            'user_id' => $user->id,
+            'action' => "{$user->name} Request new password"
+
+        ];
+
+        $this->insertSystemLogs($logs);
 
         return $this->sendResponse([], 'Temporary Password sent to your email');
 
@@ -130,8 +155,16 @@ class AuthController extends BaseController
         $user->password_changed_date = now();
         $user->save();
 
-        // $this->logUserActions($user->id, 'Change Password', "{$user->name} Change their password", null);
+        $logs = [
+            'user_id' => $user->id,
+            'action' => "{$user->name} Change their password"
+
+        ];
+
+        $this->insertSystemLogs($logs);
         return $this->sendResponse(null, 'Password changed successfully.');
     }
+
+
 
 }

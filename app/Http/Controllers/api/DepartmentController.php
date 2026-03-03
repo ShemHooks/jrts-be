@@ -9,6 +9,7 @@ use Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+
 class DepartmentController extends BaseController
 {
 
@@ -33,6 +34,8 @@ class DepartmentController extends BaseController
     public function createDepartment(Request $request)
     {
 
+        $user = Auth::user();
+
         $validator = Validator::make($request->all(), [
             'department_code' => "nullable|string",
             'dept_name' => "required|string",
@@ -50,6 +53,14 @@ class DepartmentController extends BaseController
         $dept = Department::create($input);
 
         $success['name'] = $dept->dept_name;
+
+        $logs = [
+            'user_id' => $user->id,
+            'action' => "{$user->name} Create {$dept->dept_name} department"
+
+        ];
+
+        $this->insertSystemLogs($logs);
 
         return $this->sendResponse($success, 'Department');
 
