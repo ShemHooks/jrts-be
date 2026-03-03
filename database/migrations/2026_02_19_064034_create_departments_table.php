@@ -15,10 +15,10 @@ return new class extends Migration {
             $table->string("department_code")->nullable();
             $table->string("dept_name");
             $table->string('acronym')->nullable();
-            $table->foreignUuid("dept_head_id")
+            $table->foreignUuid("dept_head_id")->nullable()
                 ->constrained("users")
-                ->cascadeOnDelete()->nullable();
-            $table->foreignUuid("parent_id")->constrained('departments')->cascadeOnDelete()->nullable();
+                ->cascadeOnDelete();
+            $table->foreignUuid("parent_id")->nullable()->constrained('departments')->cascadeOnDelete();
             $table->enum('status', ['active', 'archived'])->default('active');
             $table->timestamps();
         });

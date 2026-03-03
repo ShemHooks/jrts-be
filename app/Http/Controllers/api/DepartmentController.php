@@ -36,6 +36,7 @@ class DepartmentController extends BaseController
         $validator = Validator::make($request->all(), [
             'department_code' => "nullable|string",
             'dept_name' => "required|string",
+            'acronym' => "nullable|string",
             'dept_head_id' => "nullable|string"
         ]);
 
