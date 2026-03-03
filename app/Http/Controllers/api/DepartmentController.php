@@ -36,7 +36,33 @@ class DepartmentController extends BaseController
         $validator = Validator::make($request->all(), [
             'department_code' => "nullable|string",
             'dept_name' => "required|string",
-            'dept_head_id' => "required|string"
+            'dept_head_id' => "nullable|string"
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors());
+        }
+
+        $input = $request->all();
+
+
+        $dept = Department::create($input);
+
+        $success['name'] = $dept->dept_name;
+
+        return $this->sendResponse($success, 'Department');
+
+
+    }
+
+    public function createSubDepartment(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'department_code' => "nullable|string",
+            'dept_name' => "required|string",
+            'dept_head_id' => "nullable|string",
+            'parent_id' => "required|string"
         ]);
 
         if ($validator->fails()) {
@@ -69,9 +95,9 @@ class DepartmentController extends BaseController
             return $this->sendError("Department is Already Archived", []);
         }
 
-        $user->status = 'archive';
+        $department->status = 'archive';
 
-        $user->save();
+        $department->save();
 
         return $this->sendResponse([], "Department Archived Successfully");
 
@@ -91,14 +117,25 @@ class DepartmentController extends BaseController
             return $this->sendError("Department is Already Active", []);
         }
 
-        $user->status = 'active';
+        $department->status = 'active';
 
-        $user->save();
+        $department->save();
 
         return $this->sendResponse([], "Department Archived Successfully");
     }
 
-    public function deleteDepartment()
+    public function deleteDepartment(string $id)
+    {
+        $department = Department::findOrFail($id);
+
+        if ($department->status === 'active') {
+            return $this->sendError("Department is Active", []);
+        }
+
+        $department->delete();
+
+        return $this->sendResponse([], "Department Deleted Successfully");
+    }
 
 
 }

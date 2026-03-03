@@ -14,9 +14,11 @@ return new class extends Migration {
             $table->uuid(column: 'id')->primary();
             $table->string("department_code")->nullable();
             $table->string("dept_name");
+            $table->string('acronym')->nullable();
             $table->foreignUuid("dept_head_id")
                 ->constrained("users")
-                ->cascadeOnDelete();
+                ->cascadeOnDelete()->nullable();
+            $table->foreignUuid("parent_id")->constrained('departments')->cascadeOnDelete()->nullable();
             $table->enum('status', ['active', 'archived'])->default('active');
             $table->timestamps();
         });
