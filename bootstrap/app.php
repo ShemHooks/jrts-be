@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Illuminate\Auth\AuthenticationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,9 +16,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.only' => \App\Http\Middleware\AdminOnlyMiddleWare::class,
         ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
 
+        $exceptions->render(function (AuthenticationException $e, $request) {
+
+            return response()->json([
+                'message' => 'Unauthenticated.'
+            ], 401);
+
+        });
 
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+    ->create();
+

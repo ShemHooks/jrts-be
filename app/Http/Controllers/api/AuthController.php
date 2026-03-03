@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\ForgotPassword;
 
 
 
@@ -22,6 +23,7 @@ class AuthController extends BaseController
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
+            'employee_id' => 'nullable|string|unique:users,employee_id',
             'dept_id' => 'nullable|string|exists:departments,id',
             'position' => 'required|string|max:255',
             'suffix' => 'nullable|string',
@@ -66,6 +68,39 @@ class AuthController extends BaseController
             return $this->sendError('Not Authorized', ['error' => 'Invalid Credentials.'], 403);
         }
 
+    }
+
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'email',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error', $validator->error());
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        $temporary_password = Str::random(8);
+
+        $user->password = bcrypt($temporary_password);
+        $user->required_change = 1;
+        $user->save();
+
+        Mail::to($user->email)->send(new ForgotPassword($user->name, $temporary_password));
+
+        return $this->sendResponse([], 'Temporary Password sent to your email');
+
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->currentAccessToken()->delete();
+
+        return $this->sendResponse(null, "User logged out successfully");
     }
 
 }

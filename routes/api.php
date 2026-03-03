@@ -10,25 +10,17 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+// Authentication 
 Route::controller(AuthController::class)->prefix("auth")->group(function () {
     Route::post('login', 'login');
 });
 
-// Authenticated User Only
 
-Route::middleware(['auth.sanctum'])->group(function () {
-
-    // Admin Only Routes
-    Route::middleware('admin.only')->group(function () {
-        Route::controller(AuthController::class)->prefix('register')->group(function () {
-            Route::post('user', 'registerEmployees');
-        });
-
-        Route::controller(DepartmentController::class)->prefix('dept')->group(function () {
-            Route::post('create', 'createDepartment');
-        });
+// User Management
+Route::middleware(['auth:sanctum', 'admin.only'])
+    ->post('/register/user', [AuthController::class, 'register']);
 
 
-    });
 
-});
+
+

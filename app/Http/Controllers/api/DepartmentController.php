@@ -98,5 +98,7 @@ class DepartmentController extends BaseController
         return $this->sendResponse([], "Department Archived Successfully");
     }
 
+    public function deleteDepartment()
+
 
 }
