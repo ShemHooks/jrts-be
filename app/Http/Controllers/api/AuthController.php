@@ -18,8 +18,10 @@ use App\Mail\ForgotPassword;
 
 class AuthController extends BaseController
 {
-    public function register(Request $request): JsonResponse
+    public function employeeRegistration(Request $request): JsonResponse
     {
+        $creator = Auth::user();
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
@@ -46,14 +48,53 @@ class AuthController extends BaseController
         $success['name'] = $user->name;
 
         $logs = [
-            'user_id' => $user->id,
-            'action' => "{$user->name} Create {$user->name} Account"
+            'action' => "{$creator->name} Create {$user->name} Account"
 
         ];
 
         $this->insertSystemLogs($logs);
 
         return $this->sendResponse($success, 'User Created Successfully');
+    }
+
+    public function clientRegistration(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'department' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error', $validator->errors());
+        }
+
+        $role = 'client';
+
+        $input = $request->all();
+        $input['role'] = $role;
+        $input['required_change'] = false;
+        $input['password_changed_date'] = null;
+        $input['is_activated'] = false;
+        $input['account_status'] = 'archived';
+        $input['employee_id'] = '';
+        $input['name'] = '';
+        $input['position'] = '';
+
+        $user = User::create($input);
+
+        $success['name'] = $user->name;
+
+        $logs = [
+
+            'action' => "{$user->name} Create a New Account"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
+        return $this->sendResponse($success, 'User Created Successfully');
+
     }
 
     public function login(Request $request)
@@ -87,7 +128,6 @@ class AuthController extends BaseController
         }
 
     }
-
 
     public function forgotPassword(Request $request): JsonResponse
     {
@@ -164,7 +204,5 @@ class AuthController extends BaseController
         $this->insertSystemLogs($logs);
         return $this->sendResponse(null, 'Password changed successfully.');
     }
-
-
 
 }

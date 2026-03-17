@@ -20,6 +20,7 @@ class Department extends Model
         'acronym',
         'dept_head_id',
         'parent_id',
+        'status'
     ];
 
     public function deptAdmin()

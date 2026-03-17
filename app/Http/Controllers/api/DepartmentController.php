@@ -55,7 +55,6 @@ class DepartmentController extends BaseController
         $success['name'] = $dept->dept_name;
 
         $logs = [
-            'user_id' => $user->id,
             'action' => "{$user->name} Create {$dept->dept_name} department"
 
         ];
@@ -69,12 +68,14 @@ class DepartmentController extends BaseController
 
     public function createSubDepartment(Request $request)
     {
+        $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
             'department_code' => "nullable|string",
             'dept_name' => "required|string",
             'dept_head_id' => "nullable|string",
             'parent_id' => "required|string"
+
         ]);
 
         if ($validator->fails()) {
@@ -87,6 +88,14 @@ class DepartmentController extends BaseController
         $dept = Department::create($input);
 
         $success['name'] = $dept->dept_name;
+
+        $logs = [
+
+            'action' => "{$user->name} Create {$dept->dept_name} department"
+
+        ];
+
+        $this->insertSystemLogs($logs);
 
         return $this->sendResponse($success, 'Department');
 
@@ -103,13 +112,21 @@ class DepartmentController extends BaseController
 
         $department = Department::findOrFail($id);
 
-        if ($department->status === 'archive') {
+        if ($department->status === 'archived') {
             return $this->sendError("Department is Already Archived", []);
         }
 
-        $department->status = 'archive';
+        $department->status = 'archived';
 
         $department->save();
+
+        $logs = [
+
+            'action' => "{$user->name} Archived {$department->dept_name} department"
+
+        ];
+
+        $this->insertSystemLogs($logs);
 
         return $this->sendResponse([], "Department Archived Successfully");
 
@@ -133,11 +150,21 @@ class DepartmentController extends BaseController
 
         $department->save();
 
+        $logs = [
+
+            'action' => "{$user->name} Unarchived {$department->dept_name} department"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
         return $this->sendResponse([], "Department Archived Successfully");
     }
 
     public function deleteDepartment(string $id)
     {
+        $user = Auth::user();
+
         $department = Department::findOrFail($id);
 
         if ($department->status === 'active') {
@@ -145,6 +172,14 @@ class DepartmentController extends BaseController
         }
 
         $department->delete();
+
+        $logs = [
+
+            'action' => "{$user->name} Deleted {$department->dept_name} department"
+
+        ];
+
+        $this->insertSystemLogs($logs);
 
         return $this->sendResponse([], "Department Deleted Successfully");
     }

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Http\Controllers\api\BaseController as BaseController;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserManagement extends BaseController
 {
@@ -34,6 +36,79 @@ class UserManagement extends BaseController
             })->paginate((int) $number_per_page);
 
         return $this->sendResponse($users, 'List of Users');
+    }
+
+    public function archiveAccount(string $id)
+    {
+        $initiator = Auth::user();
+
+        $user = User::findOrFail($id);
+
+        if ($user->account_status === 'archived') {
+            return $this->sendError('User Account Already Archived');
+        }
+
+        $user->account_status = 'archived';
+
+        $user->save();
+
+        $logs = [
+            'action' => "{$initiator->name} Archived {$user->name} Account"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
+        return $this->sendResponse([], 'User Archived Successfully');
+
+    }
+
+    public function unArchiveAccount(string $id)
+    {
+        $initiator = Auth::user();
+
+        $user = User::findOrFail($id);
+
+        if ($user->account_status === 'active') {
+            return $this->sendError('User Account Already Active');
+        }
+
+        $user->account_status = 'active';
+
+        $user->save();
+
+        $logs = [
+            'action' => "{$initiator->name} Unarchived {$user->name} Account"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
+        return $this->sendResponse([], 'User Archived Successfully');
+    }
+
+    public function deleteUserAccount(string $id)
+    {
+        $initiator = Auth::user();
+
+        $user = User::findOrFail($id);
+
+        if ($user->account_status === 'active') {
+            return $this->sendError('User Account is Active', []);
+        }
+
+        $user->delete();
+
+        $logs = [
+
+            'action' => "{$initiator->name} deleted {$user->name} Account"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
+        return $this->sendResponse('User Deleted Successfully');
+
     }
 
 

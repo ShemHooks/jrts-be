@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DepartmentController;
+use App\Http\Controllers\api\UserManagement;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -13,9 +14,10 @@ Route::get('/user', function (Request $request) {
 // Authentication 
 Route::controller(AuthController::class)->prefix("auth")->group(function () {
     Route::post('login', 'login');
+    Route::post('/register', 'clientRegistration');
 
     Route::middleware(['auth:sanctum', 'admin.only'])
-        ->post('/register/user', 'register');
+        ->post('/register/employee', 'employeeRegistration');
 });
 
 
@@ -34,6 +36,17 @@ Route::controller(DepartmentController::class)->prefix("department")->group(func
 
     Route::middleware(['auth:sanctum', 'admin.only'])->delete('deleteDepartment/${id}', 'deleteDepartment');
 
+});
+
+Route::controller(UserManagement::class)->prefix('user')->group(function () {
+
+    Route::middleware(['auth:sanctum'])->get('retrieve', 'index');
+
+    Route::middleware(['auth:sanctum', 'admin.only'])->post('archive/${id}', 'archiveAccount');
+
+    Route::middleware(['auth:sanctum', 'admin.only'])->post('unarchive/${id}', 'unArchiveAccount');
+
+    Route::middleware(['auth:sanctum', 'admin.only'])->delete('delete/${id}', 'deleteUserAccount');
 
 });
 
