@@ -5,18 +5,18 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-
-
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('sysetm_logs', function (Blueprint $table) {
+        Schema::create('job_request_time_stamps', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('user_id')->constrained('users');
-            $table->string("action")->nullable();
-            $table->boolean('is_hidden')->default(false);
+            $table->foreignUuid('request_id')->constrained('job_requests')->cascadeOnDelete();
+            $table->string('action');
+            $table->string('description')->nullable();
+            $table->date('date');
+            $table->time('time');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('sysetm_logs');
+        Schema::dropIfExists('job_request_time_stamps');
     }
 };

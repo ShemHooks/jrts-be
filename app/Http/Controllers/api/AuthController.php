@@ -48,6 +48,7 @@ class AuthController extends BaseController
         $success['name'] = $user->name;
 
         $logs = [
+            'user_id' => $creator->id,
             'action' => "{$creator->name} Create {$user->name} Account"
 
         ];
@@ -86,7 +87,7 @@ class AuthController extends BaseController
         $success['name'] = $user->name;
 
         $logs = [
-
+            'user_id' => $user->id,
             'action' => "{$user->name} Create a New Account"
 
         ];
@@ -115,7 +116,7 @@ class AuthController extends BaseController
 
             $logs = [
                 'user_id' => $user->id,
-                'action' => "{$user->name} Change Login"
+                'action' => "{$user->name}  Logged In"
 
             ];
 

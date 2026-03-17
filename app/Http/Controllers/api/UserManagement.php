@@ -53,6 +53,8 @@ class UserManagement extends BaseController
         $user->save();
 
         $logs = [
+            'user_id' => $initiator->id,
+
             'action' => "{$initiator->name} Archived {$user->name} Account"
 
         ];
@@ -78,6 +80,8 @@ class UserManagement extends BaseController
         $user->save();
 
         $logs = [
+            'user_id' => $initiator->id,
+
             'action' => "{$initiator->name} Unarchived {$user->name} Account"
 
         ];
@@ -100,6 +104,7 @@ class UserManagement extends BaseController
         $user->delete();
 
         $logs = [
+            'user_id' => $initiator->id,
 
             'action' => "{$initiator->name} deleted {$user->name} Account"
 

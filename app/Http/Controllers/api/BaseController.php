@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller as Controller;
 use App\Models\System_Log;
+use App\Models\JobRequestTimeStamp;
 
 
 class BaseController extends Controller
@@ -15,10 +16,22 @@ class BaseController extends Controller
             $logs = System_Log::create($data);
             return $logs;
         } catch (\Exception $e) {
-            \Log::error("Recording Logs Error", $e->getMessage());
+            \Log::error("Recording Logs Error: " . $e->getMessage());
             return null;
         }
     }
+
+    public function requestTimeStamp(array $data)
+    {
+        try {
+            $timestamp = JobRequestTimeStamp::create($data);
+            return $timestamp;
+        } catch (\Exception $e) {
+            \Log::error("Recording Timestamp Error: " . $e->getMessage());
+            return null;
+        }
+    }
+
     public function sendResponse($result = null, $message)
     {
         $response = [

@@ -55,6 +55,8 @@ class DepartmentController extends BaseController
         $success['name'] = $dept->dept_name;
 
         $logs = [
+            'user_id' => $user->id,
+
             'action' => "{$user->name} Create {$dept->dept_name} department"
 
         ];
@@ -90,6 +92,7 @@ class DepartmentController extends BaseController
         $success['name'] = $dept->dept_name;
 
         $logs = [
+            'user_id' => $user->id,
 
             'action' => "{$user->name} Create {$dept->dept_name} department"
 
@@ -121,6 +124,8 @@ class DepartmentController extends BaseController
         $department->save();
 
         $logs = [
+            'user_id' => $user->id,
+
 
             'action' => "{$user->name} Archived {$department->dept_name} department"
 
@@ -151,6 +156,7 @@ class DepartmentController extends BaseController
         $department->save();
 
         $logs = [
+            'user_id' => $user->id,
 
             'action' => "{$user->name} Unarchived {$department->dept_name} department"
 
@@ -174,6 +180,7 @@ class DepartmentController extends BaseController
         $department->delete();
 
         $logs = [
+            'user_id' => $user->id,
 
             'action' => "{$user->name} Deleted {$department->dept_name} department"
 
