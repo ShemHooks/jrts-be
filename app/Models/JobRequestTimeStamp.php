@@ -11,11 +11,10 @@ class JobRequestTimeStamp extends Model
     use HasUuids;
 
     protected $fillable = [
-        ,
+
         'description',
         'request_id',
         'action',
-        'look_for',
         'date',
         'time'
     ];

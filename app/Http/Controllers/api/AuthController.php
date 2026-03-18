@@ -104,7 +104,7 @@ class AuthController extends BaseController
 
             $user = Auth::user();
 
-            if (!$user->is_activated) {
+            if (!$user->account_status === "archived") {
                 return $this->sendError('Not Authorized', ['error' => 'Your Account is Archived, Please contact administrator'], 403);
             }
 

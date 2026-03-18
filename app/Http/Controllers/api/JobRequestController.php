@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use Date;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Support\Facades\Auth;
@@ -16,15 +17,78 @@ class JobRequestController extends BaseController
         $keyword = $request->input('keyword');
         $status = $request->input('status');
 
-        $department = JobRequest::when($status, function ($query) use ($status) {
-            $query->where('status', $status);
-        })
+        $jobRequests = JobRequest::with(['requester', 'requestingOffice'])
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
+            })
             ->when($keyword, function ($query) use ($keyword) {
-                $query->where('title', 'like', "%{$keyword}%")
-                    ->orWhere('look_for', 'like', "%{$keyword}%");
-            })->paginate((int) $number_per_page);
+                $query->where(function ($q) use ($keyword) {
 
 
-        return $this->sendResponse($department, 'List of Users');
+                    $q->where('title', 'like', "%{$keyword}%")
+                        ->orWhere('look_for', 'like', "%{$keyword}%");
+
+                    $q->orWhereHas('requester', function ($qq) use ($keyword) {
+                        $qq->where('name', 'like', "%{$keyword}%");
+                    });
+
+                    $q->orWhereHas('requestingOffice', function ($qq) use ($keyword) {
+                        $qq->where('name', 'like', "%{$keyword}%");
+                    });
+
+                });
+            })
+            ->paginate((int) $number_per_page);
+
+
+        return $this->sendResponse($jobRequests, 'List of Jobs');
+    }
+
+    public function createJobRequest(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'require|string',
+            'requested_by' => 'required|string',
+            'description' => 'required|string',
+            'requested_from' => 'required|string',
+            'look_for' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors());
+        }
+
+        $input = $request->all();
+
+        $job_request = JobRequest::create($input);
+
+        $success['title'] = $job_request->title;
+
+        $logs = [
+            'user_id' => $user->id,
+
+            'action' => "{$user->name} Created {$job_request->title} request"
+
+        ];
+
+        $this->insertSystemLogs($logs);
+
+        $date = now()->format('F d, Y');
+        $time = now()->format('H:i');
+
+        $timeStamp = [
+            'request_id' => $job_request->id,
+            'description' => "{$user->name} Created {$job_request->title} request on {$date} ",
+            'action' => 'processed',
+            'date' => $date,
+            'time' => $time
+        ];
+
+        $this->requestTimeStamp($timeStamp);
+
+        return $this->sendResponse([], 'Job Request Submitted Successfully');
+
     }
 }
