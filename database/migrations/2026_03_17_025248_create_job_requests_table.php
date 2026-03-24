@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->foreignUuid('requested_by')->constrained('users')->cascadeOnDelete();
             $table->string('title');
             $table->string('description')->nullable();
-            $table->enum('status', ['pending', 'accepted', 'responding', 'in-bounded', 'done'])->default('pending');
+            $table->enum('status', ['pending', 'accepted', 'responding', 'in-bounded', 'done',])->default('pending');
             $table->foreignUuid('requested_from')->constrained('departments')->cascadeOnDelete();
             $table->string('look_for')->nullable();
             $table->timestamps();

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DepartmentController;
 use App\Http\Controllers\api\UserManagement;
+use App\Http\Controllers\api\DashboardController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -51,6 +52,9 @@ Route::controller(UserManagement::class)->prefix('user')->group(function () {
 });
 
 
+Route::controller(DashboardController::class)->prefix('dashboard')->group(function () {
+    Route::get('admin', 'admin');
+});
 
 
 

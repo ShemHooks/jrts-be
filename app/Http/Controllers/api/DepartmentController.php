@@ -102,7 +102,6 @@ class DepartmentController extends BaseController
 
         return $this->sendResponse($success, 'Department');
 
-
     }
 
     public function archiveDepartment(string $id)
