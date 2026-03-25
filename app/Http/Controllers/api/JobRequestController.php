@@ -17,6 +17,7 @@ class JobRequestController extends BaseController
         $keyword = $request->input('keyword');
         $status = $request->input('status');
 
+
         $jobRequests = JobRequest::with(['requester', 'requestingOffice'])
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
@@ -88,7 +89,7 @@ class JobRequestController extends BaseController
 
         $this->requestTimeStamp($timeStamp);
 
-        return $this->sendResponse([], 'Job Request Submitted Successfully');
+        return $this->sendResponse($success, 'Job Request Submitted Successfully');
 
     }
 }

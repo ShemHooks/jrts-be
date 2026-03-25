@@ -58,5 +58,19 @@ class DashboardController extends BaseController
             return $this->sendError('Server error. Kindly contact system administrator', $e->getMessage());
         }
 
+
+
+    }
+
+    public function client()
+    {
+        $status_counts = JobRequest::selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $pending_count = $status_counts['pending'] ?? 0;
+        $responding_count = $status_counts['responding'] ?? 0;
+        $inbound_count = $status_counts['in-bounded'] ?? 0;
+        $done_tasks_count = $status_counts['done'] ?? 0;
     }
 }

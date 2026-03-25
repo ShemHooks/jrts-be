@@ -61,6 +61,7 @@ class AuthController extends BaseController
     public function clientRegistration(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'department' => 'nullable|string'
@@ -79,7 +80,6 @@ class AuthController extends BaseController
         $input['is_activated'] = false;
         $input['account_status'] = 'archived';
         $input['employee_id'] = '';
-        $input['name'] = '';
         $input['position'] = '';
 
         $user = User::create($input);

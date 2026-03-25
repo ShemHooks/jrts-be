@@ -6,6 +6,7 @@ use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\DepartmentController;
 use App\Http\Controllers\api\UserManagement;
 use App\Http\Controllers\api\DashboardController;
+use App\Http\Controllers\api\ProfileController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -56,5 +57,7 @@ Route::controller(DashboardController::class)->prefix('dashboard')->group(functi
     Route::get('admin', 'admin');
 });
 
-
+Route::controller(ProfileController::class)->prefix('profile')->group(function () {
+    Route::middleware(['auth:sanctum'])->get('retrieve', 'userProfile');
+});
 
