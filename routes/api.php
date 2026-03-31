@@ -7,6 +7,7 @@ use App\Http\Controllers\api\DepartmentController;
 use App\Http\Controllers\api\UserManagement;
 use App\Http\Controllers\api\DashboardController;
 use App\Http\Controllers\api\ProfileController;
+use App\Http\Controllers\api\JobRequestController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -54,10 +55,14 @@ Route::controller(UserManagement::class)->prefix('user')->group(function () {
 
 
 Route::controller(DashboardController::class)->prefix('dashboard')->group(function () {
-    Route::get('admin', 'admin');
+    Route::middleware(['auth:sanctum', 'admin.only'])->get('admin', 'admin');
+    Route::middleware(['auth:sanctum'])->get('client', 'client');
 });
 
 Route::controller(ProfileController::class)->prefix('profile')->group(function () {
     Route::middleware(['auth:sanctum'])->get('retrieve', 'userProfile');
 });
 
+Route::controller(JobRequestController::class)->prefix('tickets')->group(function () {
+    Route::middleware(['auth:sanctum'])->get('individual', 'retrieveIndividualRequest');
+});

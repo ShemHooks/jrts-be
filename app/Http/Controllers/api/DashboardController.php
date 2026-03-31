@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\JobRequest;
 use App\Models\JobRequestTimeStamp;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 
 class DashboardController extends BaseController
@@ -55,7 +56,7 @@ class DashboardController extends BaseController
             ], 'Dashboard data retrieved successfully');
 
         } catch (Exception $e) {
-            return $this->sendError('Server error. Kindly contact system administrator', $e->getMessage());
+            return $this->sendError([], $e->getMessage());
         }
 
 
@@ -64,13 +65,49 @@ class DashboardController extends BaseController
 
     public function client()
     {
-        $status_counts = JobRequest::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->pluck('count', 'status');
+        try {
+            $user = Auth::user();
+            $status_counts = JobRequest::where('requested_by', $user->id)->selectRaw('status, COUNT(*) as count')
+                ->groupBy('status')
+                ->pluck('count', 'status');
 
-        $pending_count = $status_counts['pending'] ?? 0;
-        $responding_count = $status_counts['responding'] ?? 0;
-        $inbound_count = $status_counts['in-bounded'] ?? 0;
-        $done_tasks_count = $status_counts['done'] ?? 0;
+            $total_count = JobRequest::where('requested_by', $user->id)->count();
+            $pending_count = $status_counts['pending'] ?? 0;
+            $responding_count = $status_counts['responding'] ?? 0;
+            $inbound_count = $status_counts['in-bounded'] ?? 0;
+            $done_tasks_count = $status_counts['done'] ?? 0;
+
+
+            $recentRequest = JobRequest::where('requested_by', $user->id)->orderBy('created_at', 'desc')->limit(5)->get();
+
+            return $this->sendResponse([
+                'total' => [
+                    'title' => 'Total Requests',
+                    'value' => $total_count
+                ],
+                'pending' => [
+                    'title' => 'Pending Requests',
+                    'value' => $pending_count
+                ],
+                'responding' => [
+                    'title' => 'In Responding',
+                    'value' => $responding_count
+                ],
+                'inbound' => [
+                    'title' => 'Total Inbound',
+                    'value' => $inbound_count
+                ],
+                'done' => [
+                    'title' => 'Tasks Done',
+                    'value' => $done_tasks_count
+                ],
+                'recent' => $recentRequest
+            ], 'Dashboard data retrieved successfully');
+
+        } catch (Exception $e) {
+            return $this->sendError([], e->getMessage());
+        }
     }
+
+
 }

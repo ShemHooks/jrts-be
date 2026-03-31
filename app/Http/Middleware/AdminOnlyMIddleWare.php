@@ -19,7 +19,7 @@ class AdminOnlyMIddleWare
     {
         $user = Auth::user();
 
-        if (!$user || !in_array($user->role, ['admin', 'operator'])) {
+        if (!$user || $user->role !== 'admin') {
             return response()->json([
                 'success' => false,
                 'message' => 'Forbidden',

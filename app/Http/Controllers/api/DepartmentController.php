@@ -47,10 +47,10 @@ class DepartmentController extends BaseController
             return $this->sendError('Validation Error', $validator->errors());
         }
 
-        $input = $request->all();
+        $input = $request->all(); //hellow world
 
 
-        $dept = Department::create($input);
+        $dept = Department::create($input); //shem gwapohon...
 
         $success['name'] = $dept->dept_name;
 

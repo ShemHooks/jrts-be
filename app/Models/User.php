@@ -68,5 +68,10 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class);
     }
 
+    public function jobRequests()
+    {
+        return $this->hasMany(JobRequest::class, 'requested_by');
+    }
+
 
 }

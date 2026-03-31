@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\api\BaseController as BaseController;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Exception;
 
 
@@ -27,7 +26,7 @@ class ProfileController extends BaseController
 
             return $this->sendResponse($success, 'User data retrieved successfully');
 
-        } catch (\Throwable $e) {
+        } catch (Exception $e) {
             return $this->sendError([], 'Server error. Kindly contact system administrator');
         }
     }

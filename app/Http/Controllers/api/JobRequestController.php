@@ -17,7 +17,6 @@ class JobRequestController extends BaseController
         $keyword = $request->input('keyword');
         $status = $request->input('status');
 
-
         $jobRequests = JobRequest::with(['requester', 'requestingOffice'])
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
@@ -45,13 +44,26 @@ class JobRequestController extends BaseController
         return $this->sendResponse($jobRequests, 'List of Jobs');
     }
 
+    public function retrieveIndividualRequest()
+    {
+        $user = Auth::user();
+
+        $job_request = JobRequest::where('requested_by', $user->id);
+
+        if (!$job_request) {
+            return $this->sendError([], 'No Request Found');
+        }
+
+        return $this->sendResponse($job_request, 'List of Job Requests');
+
+    }
+
     public function createJobRequest(Request $request)
     {
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
             'title' => 'require|string',
-            'requested_by' => 'required|string',
             'description' => 'required|string',
             'requested_from' => 'required|string',
             'look_for' => 'nullable|string'
@@ -62,6 +74,7 @@ class JobRequestController extends BaseController
         }
 
         $input = $request->all();
+        $input['requested_by'] = $user->id;
 
         $job_request = JobRequest::create($input);
 
@@ -81,6 +94,7 @@ class JobRequestController extends BaseController
 
         $timeStamp = [
             'request_id' => $job_request->id,
+
             'description' => "{$user->name} Created {$job_request->title} request on {$date} ",
             'action' => 'processed',
             'date' => $date,
