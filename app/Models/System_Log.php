@@ -10,6 +10,8 @@ class System_Log extends Model
 
     use HasUuids;
 
+    protected $table = "sysetm_logs";
+
     public $incrementing = false;
     protected $keyType = 'string';
     protected $fillable = [

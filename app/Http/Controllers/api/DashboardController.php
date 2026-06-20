@@ -21,7 +21,7 @@ class DashboardController extends BaseController
                 ->pluck('count', 'status');
 
             $pending_count = $status_counts['pending'] ?? 0;
-            $responding_count = $status_counts['responding'] ?? 0;
+            $responding_count = $status_counts['accepted'] ?? 0;
             $inbound_count = $status_counts['in-bounded'] ?? 0;
             $done_tasks_count = $status_counts['done'] ?? 0;
 

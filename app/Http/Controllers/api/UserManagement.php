@@ -20,7 +20,7 @@ class UserManagement extends BaseController
         $role = $request->input('role');
         $position = $request->input('position');
 
-        $users = User::with('office')
+        $users = User::with('department')
             ->when($status, function ($query) use ($status) {
                 $query->where('status', $status);
             })
@@ -34,6 +34,19 @@ class UserManagement extends BaseController
                 $query->where('name', 'like', "%{$keyword}%")
                     ->orWhere('email', 'like', "%{$keyword}%");
             })->paginate((int) $number_per_page);
+
+        $users->getCollection()->transform(function ($user) {
+            return [
+                'id' => $user->id,
+                'employee_id' => $user->employee_id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'account_status' => $user->account_status,
+                'department_name' => $user->department?->acronym,
+            ];
+        });
+
 
         return $this->sendResponse($users, 'List of Users');
     }

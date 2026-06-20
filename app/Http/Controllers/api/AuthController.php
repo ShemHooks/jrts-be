@@ -26,7 +26,7 @@ class AuthController extends BaseController
             'name' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
             'employee_id' => 'nullable|string|unique:users,employee_id',
-            'dept_id' => 'nullable|string|exists:departments,id',
+            'dept_id' => 'required|string|exists:departments,id',
             'position' => 'required|string|max:255',
             'suffix' => 'nullable|string',
             'role' => "required|string",

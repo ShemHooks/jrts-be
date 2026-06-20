@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-
-class JobRequestTimeStamp extends Model
+class JobRequestTechnician extends Model
 {
     use HasUuids;
 
@@ -14,17 +13,17 @@ class JobRequestTimeStamp extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-
-        'description',
         'request_id',
-        'action',
-        'date',
-        'time'
+        'technician_id'
     ];
 
-    public function requests()
+    public function request()
     {
         return $this->belongsTo(JobRequest::class, 'request_id');
     }
 
+    public function technician()
+    {
+        return $this->belongsTo(User::class, 'technician_id');
+    }
 }

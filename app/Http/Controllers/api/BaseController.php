@@ -5,10 +5,22 @@ namespace App\Http\Controllers\api;
 use App\Http\Controllers\Controller as Controller;
 use App\Models\System_Log;
 use App\Models\JobRequestTimeStamp;
+use App\Models\Notification;
 
 
 class BaseController extends Controller
 {
+
+    public function insertNotification(array $data)
+    {
+        try {
+            $notifications = Notification::create($data);
+            return $notifications;
+        } catch (\Exception $e) {
+            \Log::error("Recording Notification Error: " . $e->getMessage());
+            return null;
+        }
+    }
 
     public function insertSystemLogs(array $data)
     {

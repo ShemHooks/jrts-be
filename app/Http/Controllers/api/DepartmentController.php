@@ -37,47 +37,11 @@ class DepartmentController extends BaseController
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'department_code' => "nullable|string",
-            'dept_name' => "required|string",
-            'acronym' => "nullable|string",
-            'dept_head_id' => "nullable|string"
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors());
-        }
-
-        $input = $request->all(); //hellow world
-
-
-        $dept = Department::create($input); //shem gwapohon...
-
-        $success['name'] = $dept->dept_name;
-
-        $logs = [
-            'user_id' => $user->id,
-
-            'action' => "{$user->name} Create {$dept->dept_name} department"
-
-        ];
-
-        $this->insertSystemLogs($logs);
-
-        return $this->sendResponse($success, 'Department');
-
-
-    }
-
-    public function createSubDepartment(Request $request)
-    {
-        $user = Auth::user();
-
-        $validator = Validator::make($request->all(), [
-            'department_code' => "nullable|string",
-            'dept_name' => "required|string",
-            'dept_head_id' => "nullable|string",
-            'parent_id' => "required|string"
-
+            'department_code' => 'nullable|string',
+            'dept_name' => 'required|string',
+            'acronym' => 'nullable|string',
+            'dept_head_id' => 'nullable|string',
+            'parent_id' => 'nullable|string|exists:departments,id'
         ]);
 
         if ($validator->fails()) {
@@ -103,6 +67,8 @@ class DepartmentController extends BaseController
         return $this->sendResponse($success, 'Department');
 
     }
+
+
 
     public function archiveDepartment(string $id)
     {

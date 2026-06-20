@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'employee_id',
         'is_activated',
+        'dept_id',
         'name',
         'suffix',
         'position',
@@ -65,12 +66,22 @@ class User extends Authenticatable
 
     public function department()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class, 'dept_id');
     }
 
     public function jobRequests()
     {
         return $this->hasMany(JobRequest::class, 'requested_by');
+    }
+
+    public function assignedRequests()
+    {
+        return $this->belongsToMany(
+            JobRequest::class,
+            'job_request_technicians',
+            'technician_id',
+            'request_id'
+        );
     }
 
 

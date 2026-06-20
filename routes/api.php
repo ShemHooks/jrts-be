@@ -8,10 +8,18 @@ use App\Http\Controllers\api\UserManagement;
 use App\Http\Controllers\api\DashboardController;
 use App\Http\Controllers\api\ProfileController;
 use App\Http\Controllers\api\JobRequestController;
+use App\Http\Controllers\api\AppController;
+use App\Http\Controllers\api\NotificationController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::controller(AppController::class)->prefix("app")->group(function () {
+    Route::get("department/list", "retrieveDepartmentList");
+    Route::middleware(['auth:sanctum', 'admin.only'])->get('technicians/list', 'TechniciansList');
+});
 
 
 // Authentication 
@@ -31,11 +39,9 @@ Route::controller(DepartmentController::class)->prefix("department")->group(func
 
     Route::middleware(['auth:sanctum', 'admin.only'])->post('/create', 'createDepartment');
 
-    Route::middleware(['auth:sanctum', 'admin.only'])->post('/create/sub', 'createSubDepartment');
+    Route::middleware(['auth:sanctum', 'admin.only'])->post('archive/{id}', 'archiveDepartment');
 
-    Route::middleware(['auth:sanctum', 'admin.only'])->post('archive/${id}', 'archiveDepartment');
-
-    Route::middleware(['auth:sanctum', 'admin.only'])->post('unarchive/${id}', 'unarchiveDepartment');
+    Route::middleware(['auth:sanctum', 'admin.only'])->post('unarchive/{id}', 'unarchiveDepartment');
 
     Route::middleware(['auth:sanctum', 'admin.only'])->delete('deleteDepartment/${id}', 'deleteDepartment');
 
@@ -45,11 +51,11 @@ Route::controller(UserManagement::class)->prefix('user')->group(function () {
 
     Route::middleware(['auth:sanctum'])->get('retrieve', 'index');
 
-    Route::middleware(['auth:sanctum', 'admin.only'])->post('archive/${id}', 'archiveAccount');
+    Route::middleware(['auth:sanctum', 'admin.only'])->post('archive/{id}', 'archiveAccount');
 
-    Route::middleware(['auth:sanctum', 'admin.only'])->post('unarchive/${id}', 'unArchiveAccount');
+    Route::middleware(['auth:sanctum', 'admin.only'])->post('unarchive/{id}', 'unArchiveAccount');
 
-    Route::middleware(['auth:sanctum', 'admin.only'])->delete('delete/${id}', 'deleteUserAccount');
+    Route::middleware(['auth:sanctum', 'admin.only'])->delete('delete/{id}', 'deleteUserAccount');
 
 });
 
@@ -65,4 +71,13 @@ Route::controller(ProfileController::class)->prefix('profile')->group(function (
 
 Route::controller(JobRequestController::class)->prefix('tickets')->group(function () {
     Route::middleware(['auth:sanctum'])->get('individual', 'retrieveIndividualRequest');
+    Route::middleware(["auth:sanctum"])->post("create", "createJobRequest");
+    Route::middleware(["auth:sanctum", "admin.only"])->get("retrieve", "index");
+    Route::middleware(['auth:sanctum', 'admin.only'])->post("assign/tech", 'assignTech');
+});
+
+ROute::controller(NotificationController::class)->prefix('notification')->group(function () {
+    Route::middleware(['auth:sanctum'])->get('list', 'index');
+    Route::middleware(['auth:sanctum'])->get('count', 'getUnreadNotificationCount');
+
 });
